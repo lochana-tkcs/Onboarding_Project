@@ -254,20 +254,71 @@
 #     uvicorn.run(app, host="127.0.0.1", port=8000)
 
 
+# from litestar import Litestar, Request, Response, post, get
+# from litestar.config.cors import CORSConfig
+# import csv
+# import io
+# import duckdb
+# import pandas as pd
+
+# # Configure CORS
+# cors_config = CORSConfig(allow_origins=["http://localhost:8080"])
+
+# async def upload_csv(request: Request) -> Response:
+#     form = await request.form()
+#     uploaded_file = form['file']
+    
+#     content = await uploaded_file.read()
+#     csv_content = io.StringIO(content.decode('utf-8'))
+
+#     reader = csv.reader(csv_content)
+#     data = [row for row in reader]
+
+#     # Convert CSV data to a DataFrame and load it into DuckDB
+#     df = pd.DataFrame(data[1:], columns=data[0])  # Assume first row is the header
+
+#     # Create a DuckDB connection and load the data
+#     con = duckdb.connect('my_database.db')
+#     con.execute("DROP TABLE IF EXISTS my_table")  # Drop the existing table if it exists
+#     con.execute("CREATE TABLE my_table AS SELECT * FROM df LIMIT 0")  # Create table with appropriate schema
+#     con.execute("INSERT INTO my_table SELECT * FROM df")
+    
+#     schema = con.execute("DESCRIBE my_table").fetchall()
+#     result = con.execute("SELECT * FROM my_table").fetchall()
+
+#     return Response({"message": "File uploaded successfully and data inserted into DuckDB", "data": result, "schema": schema}, media_type="application/json")
+
+# @post("/upload")
+# async def upload_csv_endpoint(request: Request) -> Response:
+#     return await upload_csv(request)
+
+# @get("/data")
+# async def get_csv_data(request: Request) -> Response:
+#     # Retrieve the data from DuckDB
+#     con = duckdb.connect('my_database.db')
+#     result = con.execute("SELECT * FROM my_table").fetchall()
+#     return Response({"data": result}, media_type="application/json")
+
+# # Create the Litestar app
+# app = Litestar(route_handlers=[upload_csv_endpoint, get_csv_data], cors_config=cors_config)
+
+# if __name__ == "__main__":
+#     import uvicorn
+#     uvicorn.run(app, host="127.0.0.1", port=8000)
+
 from litestar import Litestar, Request, Response, post, get
-from litestar.config.cors import CORSConfig
 import csv
 import io
+from tasks import store_csv_data
 import duckdb
-import pandas as pd
+from litestar.config.cors import CORSConfig
 
-# Configure CORS
 cors_config = CORSConfig(allow_origins=["http://localhost:8080"])
 
 async def upload_csv(request: Request) -> Response:
     form = await request.form()
     uploaded_file = form['file']
-    
+
     content = await uploaded_file.read()
     csv_content = io.StringIO(content.decode('utf-8'))
 
@@ -275,18 +326,13 @@ async def upload_csv(request: Request) -> Response:
     data = [row for row in reader]
 
     # Convert CSV data to a DataFrame and load it into DuckDB
-    df = pd.DataFrame(data[1:], columns=data[0])  # Assume first row is the header
+    columns = data[0]
+    rows = data[1:]
 
-    # Create a DuckDB connection and load the data
-    con = duckdb.connect('my_database.db')
-    con.execute("DROP TABLE IF EXISTS my_table")  # Drop the existing table if it exists
-    con.execute("CREATE TABLE my_table AS SELECT * FROM df LIMIT 0")  # Create table with appropriate schema
-    con.execute("INSERT INTO my_table SELECT * FROM df")
-    
-    schema = con.execute("DESCRIBE my_table").fetchall()
-    result = con.execute("SELECT * FROM my_table").fetchall()
+    # Send task to Celery worker
+    store_csv_data.delay(rows, columns)
 
-    return Response({"message": "File uploaded successfully and data inserted into DuckDB", "data": result, "schema": schema}, media_type="application/json")
+    return Response({"message": "File uploaded successfully and data insertion task sent to Celery"}, media_type="application/json")
 
 @post("/upload")
 async def upload_csv_endpoint(request: Request) -> Response:
@@ -299,9 +345,10 @@ async def get_csv_data(request: Request) -> Response:
     result = con.execute("SELECT * FROM my_table").fetchall()
     return Response({"data": result}, media_type="application/json")
 
-# Create the Litestar app
+# Create the Litestar app with CORS middleware
 app = Litestar(route_handlers=[upload_csv_endpoint, get_csv_data], cors_config=cors_config)
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="127.0.0.1", port=8000)
+
