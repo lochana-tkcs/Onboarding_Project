@@ -332,7 +332,7 @@ async def upload_csv(request: Request) -> Response:
     # Send task to Celery worker
     store_csv_data.delay(rows, columns)
 
-    return Response({"message": "File uploaded successfully and data insertion task sent to Celery"}, media_type="application/json")
+    return Response({"message": "File uploaded successfully and data insertion task sent to Celery", "data":data}, media_type="application/json")
 
 @post("/upload")
 async def upload_csv_endpoint(request: Request) -> Response:
