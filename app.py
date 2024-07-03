@@ -325,6 +325,9 @@ async def upload_csv(request: Request) -> Response:
     reader = csv.reader(csv_content)
     data = [row for row in reader]
 
+    if not data:
+        return Response({"message": "Empty CSV file"}, media_type="application/json", status_code=400)
+
     # Convert CSV data to a DataFrame and load it into DuckDB
     columns = data[0]
     rows = data[1:]
@@ -334,6 +337,18 @@ async def upload_csv(request: Request) -> Response:
 
     return Response({"message": "File uploaded successfully and data insertion task sent to Celery", "data":data}, media_type="application/json")
 
+# async def upload_csv(request: Request) -> Response:
+#     form = await request.form()
+#     uploaded_file = form['file']
+
+#     content = await uploaded_file.read()
+#     content_str = content.decode('utf-8')
+
+#     # Send task to Celery worker
+#     store_csv_data.delay(content_str)
+
+#     return Response({"message": "File uploaded successfully and data insertion task sent to Celery"}, media_type="application/json")
+
 @post("/upload")
 async def upload_csv_endpoint(request: Request) -> Response:
     return await upload_csv(request)
@@ -342,7 +357,11 @@ async def upload_csv_endpoint(request: Request) -> Response:
 async def get_csv_data(request: Request) -> Response:
     # Retrieve the data from DuckDB
     con = duckdb.connect('my_database.db')
-    result = con.execute("SELECT * FROM my_table").fetchall()
+    try:
+        # Fetch the table contents
+        result = con.execute("SELECT * FROM my_table").fetchdf()
+    finally:
+        con.close()
     return Response({"data": result}, media_type="application/json")
 
 # Create the Litestar app with CORS middleware

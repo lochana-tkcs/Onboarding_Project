@@ -20,7 +20,7 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in items" :key="index">
-              <td v-for="header in headers" :key="header">{{ item[header] }}</td>
+              <td v-for="(header, subIndex) in headers" :key="subIndex">{{ item[subIndex] }}</td>
             </tr>
           </tbody>
         </table>
@@ -31,6 +31,7 @@
 
 <script>
 import axios from "axios";
+
 export default {
   name: "FileUpload",
   data() {
@@ -65,11 +66,14 @@ export default {
       const formData = new FormData();
       formData.append("file", this.file);
 
+      
+
       try {
         const response = await axios.post("http://localhost:8000/upload", formData);
         this.message = "Uploaded!";
-        this.headers = Object.keys(response.data.data[0]);
-        this.items = response.data.data;
+        const firstRow = response.data.data[0];
+        this.headers = firstRow;
+        this.items = response.data.data.slice(1);
       } catch (err) {
         console.log(err);
         this.message = err.response ? err.response.data.error : "Upload failed";
