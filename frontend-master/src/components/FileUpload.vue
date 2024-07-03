@@ -11,7 +11,7 @@
       <div>
         <h5>{{ message }}</h5>
       </div>
-      <div v-if="items.length">
+      <div v-if="items.length" class="table-container">
         <table>
           <thead>
             <tr>
@@ -81,13 +81,18 @@ export default {
 
 <style scoped>
 .file-upload {
-  max-width: 600px;
+  width: 100%;
+  max-width: none;
   margin: 0 auto;
 }
 form {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+.table-container {
+  overflow-x: auto; /* Ensures the table is scrollable horizontally */
+  width: 100%;
 }
 table {
   width: 100%;
