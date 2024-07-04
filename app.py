@@ -309,9 +309,13 @@
 from litestar import Litestar, Request, Response, post, get
 import csv
 import io
+import psycopg2
+from psycopg2 import sql
+import tiktoken
 from tasks import store_csv_data
 import duckdb
 from litestar.config.cors import CORSConfig
+from pydantic import BaseModel
 
 cors_config = CORSConfig(allow_origins=["http://localhost:8080"])
 
@@ -337,18 +341,6 @@ async def upload_csv(request: Request) -> Response:
 
     return Response({"message": "File uploaded successfully and data insertion task sent to Celery", "data":data}, media_type="application/json")
 
-# async def upload_csv(request: Request) -> Response:
-#     form = await request.form()
-#     uploaded_file = form['file']
-
-#     content = await uploaded_file.read()
-#     content_str = content.decode('utf-8')
-
-#     # Send task to Celery worker
-#     store_csv_data.delay(content_str)
-
-#     return Response({"message": "File uploaded successfully and data insertion task sent to Celery"}, media_type="application/json")
-
 @post("/upload")
 async def upload_csv_endpoint(request: Request) -> Response:
     return await upload_csv(request)
@@ -369,5 +361,114 @@ app = Litestar(route_handlers=[upload_csv_endpoint, get_csv_data], cors_config=c
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="127.0.0.1", port=8080)
 
+# from litestar import Litestar, Request, Response, post, get
+# import csv
+# import io
+# import json
+# import os
+# import bcrypt
+# from tasks import store_csv_data
+# import duckdb
+# from litestar.config.cors import CORSConfig
+
+# cors_config = CORSConfig(allow_origins=["http://localhost:8080"])
+
+# USERS_FILE = 'users.json'
+
+# def read_users():
+#     if not os.path.exists(USERS_FILE):
+#         return []
+#     with open(USERS_FILE, 'r') as f:
+#         return json.load(f)
+
+# def write_users(users):
+#     with open(USERS_FILE, 'w') as f:
+#         json.dump(users, f, indent=2)
+
+# @post("/register")
+# async def register_user(request: Request) -> Response:
+#     try:
+#         body = await request.json()
+#         email = body.get("email")
+#         password = body.get("password")
+#         if not email or not password:
+#             return Response(content={"message": "Email and password are required"}, media_type="application/json", status_code=400)
+
+#         users = read_users()
+#         if any(user['email'] == email for user in users):
+#             return Response(content={"message": "User already exists"}, media_type="application/json", status_code=400)
+
+#         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+#         users.append({"email": email, "password": hashed_password.decode('utf-8')})
+#         write_users(users)
+
+#         return Response(content={"message": "User registered"}, media_type="application/json", status_code=201)
+#     except Exception as e:
+#         logger.error("Error during registration: %s", str(e))
+#         return Response(content={"message": "Internal server error"}, media_type="application/json", status_code=500)
+
+    
+# @post("/login")
+# async def login_user(request: Request) -> Response:
+#     body = await request.json()
+#     email = body.get("email")
+#     password = body.get("password")
+#     if not email or not password:
+#         return Response(content="Email and password are required", status_code=400)
+
+#     users = read_users()
+#     user = next((user for user in users if user["email"] == email), None)
+#     if not user or not bcrypt.checkpw(password.encode('utf-8'), user["password"].encode('utf-8')):
+#         return Response(content="Invalid credentials", status_code=400)
+
+#     return Response(content="Login successful", status_code=200)
+
+
+# async def upload_csv(request: Request) -> Response:
+#     form = await request.form()
+#     uploaded_file = form['file']
+
+#     content = await uploaded_file.read()
+#     csv_content = io.StringIO(content.decode('utf-8'))
+
+#     reader = csv.reader(csv_content)
+#     data = [row for row in reader]
+
+#     if not data:
+#         return Response({"message": "Empty CSV file"}, media_type="application/json", status_code=400)
+
+#     # Convert CSV data to a DataFrame and load it into DuckDB
+#     columns = data[0]
+#     rows = data[1:]
+
+#     # Send task to Celery worker
+#     store_csv_data.delay(rows, columns)
+
+#     return Response({"message": "File uploaded successfully and data insertion task sent to Celery", "data": data}, media_type="application/json")
+
+
+# @post("/upload")
+# async def upload_csv_endpoint(request: Request) -> Response:
+#     return await upload_csv(request)
+
+
+# @get("/data")
+# async def get_csv_data(request: Request) -> Response:
+#     # Retrieve the data from DuckDB
+#     con = duckdb.connect('my_database.db')
+#     try:
+#         # Fetch the table contents
+#         result = con.execute("SELECT * FROM my_table").fetchdf()
+#     finally:
+#         con.close()
+#     return Response({"data": result}, media_type="application/json")
+
+
+# # Create the Litestar app with CORS middleware
+# app = Litestar(route_handlers=[register_user, login_user, upload_csv_endpoint, get_csv_data], cors_config=cors_config)
+
+# if __name__ == "__main__":
+#     import uvicorn
+#     uvicorn.run(app, host="127.0.0.1", port=8080)
