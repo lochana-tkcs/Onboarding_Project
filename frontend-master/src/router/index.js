@@ -3,6 +3,7 @@ import Signup from '../components/SignUp.vue'
 // import RegisterPage from '../components/RegisterPage.vue';
 // import LoginPage from '../components/LoginPage.vue';
 import FileUpload from '../components/FileUpload.vue'
+import AuthButtons from '../components/AuthButtons.vue'; 
 // import FirstPage from '../components/FirstPage.vue'
 
 // const routes = [
@@ -10,7 +11,7 @@ import FileUpload from '../components/FileUpload.vue'
 // ]
 
 const routes = [
-  { path: '/', redirect: '/signup' },
+  { path: '/', component: AuthButtons },
   { path: '/signup', component: Signup },
   { path: '/upload', component: FileUpload },
 ];
