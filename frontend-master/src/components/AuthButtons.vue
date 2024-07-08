@@ -33,24 +33,40 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   data() {
     return {
       email: '',
       password: ''
-    }
+    };
   },
   methods: {
-    login() {
-      alert(`Email: ${this.email}, Password: ${this.password}`);
-      // Handle login logic here
+    async login() {
+      try {
+        // Fetch existing users
+        const { data: users } = await axios.get("http://127.0.0.1:3000/users");
+
+        // Check if the email and password match
+        const user = users.find(user => user.email === this.email && user.password === this.password);
+
+        if (user) {
+          // Redirect to upload page
+          this.$router.push('/upload');
+        } else {
+          alert('Invalid email or password. Please try again.');
+        }
+      } catch (error) {
+        console.error('There was an error!', error);
+      }
     },
     signUp() {
       // Navigate to the signup endpoint
       this.$router.push('/signup');
     }
   }
-}
+};
 </script>
 
 <style scoped>
