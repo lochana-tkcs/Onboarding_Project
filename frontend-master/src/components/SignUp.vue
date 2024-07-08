@@ -4,8 +4,8 @@
       <h1>Signup</h1>
       <form @submit.prevent="handleSignup">
         <div class="input-group">
-          <label for="username">Username:</label>
-          <input type="text" id="username" v-model="username" required />
+          <label for="email">Email:</label>
+          <input type="email" id="email" v-model="email" required />
         </div>
         <div class="input-group">
           <label for="password">Password:</label>
@@ -31,19 +31,34 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      username: '',
+      email: '',
       password: ''
     };
   },
   methods: {
     async handleSignup() {
       try {
-        console.log('Signup:', this.username, this.password);
-        const result = await axios.post("http://127.0.0.1:3000/users", {
-          username: this.username,
+        // Fetch existing users
+        const { data: users } = await axios.get("http://127.0.0.1:3000/users");
+
+        // Determine the new ID
+        let newId = 1;
+        if (users.length > 0) {
+          const ids = users.map(user => parseInt(user.id, 10));
+          newId = Math.max(...ids) + 1;
+        }
+
+        // Create new user with the new ID
+        const newUser = {
+          id: newId.toString(),
+          email: this.email,
           password: this.password
-        });
+        };
+
+        // Post new user to the database
+        const result = await axios.post("http://127.0.0.1:3000/users", newUser);
         console.warn(result);
+
         // Redirect to upload page
         this.$router.push('/upload');
       } catch (error) {

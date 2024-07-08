@@ -1,39 +1,14 @@
 {
   "users": [
     {
-      "username": "lochana@gmail.com",
-      "password": "1234",
-      "id": "b8b7"
+      "id": "1",
+      "email": "lochanasrinivas2001@gmail.com",
+      "password": "hjvrqwkurgf"
     },
     {
-      "id": "80c0",
-      "username": "lochanasrinivas2001@gmail.com",
-      "password": "123"
-    },
-    {
-      "id": "5378",
-      "username": "m2022anlt015@stud.tiss.edu",
-      "password": "hghgfhfh"
-    },
-    {
-      "id": "19d9",
-      "username": "lochanasrinivas2001@gmail.com",
-      "password": "1234567"
-    },
-    {
-      "id": "09cc",
-      "username": "lochanasrinivas2001@gmail.com",
-      "password": "jhqf"
-    },
-    {
-      "id": "ef02",
-      "username": "jzxbvjn",
-      "password": "shbjcds"
-    },
-    {
-      "id": "7917",
-      "username": "m2022anlt015@stud.tiss.edu",
-      "password": "12345678"
+      "id": "2",
+      "email": "lochanasrinivas2001@gmail.com",
+      "password": "hcgvhb"
     }
   ]
 }
