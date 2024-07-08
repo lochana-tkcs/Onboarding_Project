@@ -41,6 +41,15 @@ export default {
         // Fetch existing users
         const { data: users } = await axios.get("http://127.0.0.1:3000/users");
 
+        // Check if the email already exists
+        const existingUser = users.find(user => user.email === this.email);
+
+        if (existingUser) {
+          alert('Email already exists. Please log in.');
+          this.$router.push('/');
+          return;
+        }
+
         // Determine the new ID
         let newId = 1;
         if (users.length > 0) {
