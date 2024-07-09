@@ -1,9 +1,8 @@
 from litestar import Litestar, Request, Response, post, get
 import csv
 import io
-import psycopg2
-from psycopg2 import sql
-import tiktoken
+import os
+import pandas as pd
 from tasks import store_csv_data
 import duckdb
 from litestar.config.cors import CORSConfig
@@ -11,27 +10,49 @@ from pydantic import BaseModel
 
 cors_config = CORSConfig(allow_origins=["http://localhost:8080"])
 
+# def store_csv_data():
+#     file_path = 'C:/m3/temp.csv'
+#     con = None
+#     try:
+#         con = duckdb.connect('my_database.db')
+        
+#         # Drop the table if it exists and then create the table and load the CSV data directly
+#         con.execute("DROP TABLE IF EXISTS my_table")
+#         con.execute(f"""
+#             CREATE TABLE my_table AS
+#             SELECT * FROM read_csv_auto('{file_path}')
+#         """)
+#         result = con.execute("SELECT * FROM my_table").fetchall()
+        
+#         return result
+#     except Exception as e:
+#         # Handle exceptions appropriately
+#         print(f"An error occurred: {e}")
+#         raise e
+#     finally:
+#         if con is not None:
+#             con.close()
+#         # Clean up the temporary file
+#         if os.path.exists(file_path):
+#             os.remove(file_path)
+
 async def upload_csv(request: Request) -> Response:
+    file_path = 'C:/m3/temp.csv'
     form = await request.form()
     uploaded_file = form['file']
-
+    
     content = await uploaded_file.read()
     csv_content = io.StringIO(content.decode('utf-8'))
 
     reader = csv.reader(csv_content)
     data = [row for row in reader]
 
-    if not data:
-        return Response({"message": "Empty CSV file"}, media_type="application/json", status_code=400)
-
     # Convert CSV data to a DataFrame and load it into DuckDB
-    columns = data[0]
-    rows = data[1:]
+    df = pd.DataFrame(data[0:], columns=data[0])  # Assume first row is the header
+    df.to_csv(file_path, index=False)
+    result = store_csv_data(file_path)
 
-    # Send task to Celery worker
-    store_csv_data.delay(rows, columns)
-
-    return Response({"message": "File uploaded successfully and data insertion task sent to Celery", "data":data}, media_type="application/json")
+    return Response({"message": "File uploaded successfully and data inserted into DuckDB", "data": result}, media_type="application/json")
 
 @post("/upload")
 async def upload_csv_endpoint(request: Request) -> Response:
