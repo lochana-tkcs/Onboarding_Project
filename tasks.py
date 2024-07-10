@@ -9,7 +9,6 @@ app.config_from_object('celeryconfig')
 
 @app.task
 def store_csv_data(file_path):
-    file_path = 'C:/m3/temp.csv'
     con = None
     try:
         con = duckdb.connect('my_database.db')

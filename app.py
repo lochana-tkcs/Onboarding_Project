@@ -40,15 +40,11 @@ async def upload_csv(request: Request) -> Response:
     file_path = 'C:/m3/temp.csv'
     form = await request.form()
     uploaded_file = form['file']
-    
-    content = await uploaded_file.read()
-    csv_content = io.StringIO(content.decode('utf-8'))
 
-    reader = csv.reader(csv_content)
-    data = [row for row in reader]
+    # Read the uploaded file directly into a DataFrame
+    df = pd.read_csv(io.StringIO((await uploaded_file.read()).decode('utf-8')), header=None)
 
-    # Convert CSV data to a DataFrame and load it into DuckDB
-    df = pd.DataFrame(data[0:], columns=data[0])  # Assume first row is the header
+    # Save DataFrame to CSV
     df.to_csv(file_path, index=False)
     result = store_csv_data(file_path)
 

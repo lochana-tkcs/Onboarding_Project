@@ -27,7 +27,7 @@ session = Session()
 
 def update_database():
     # Read and parse the JSON file
-    with open('C:\\m3\\db\\db.json', 'r') as file:
+    with open('C:/m3/db/db.json', 'r') as file:
         data = json.load(file)
 
     # Fetch existing user IDs from the database to avoid duplicates

@@ -27,6 +27,7 @@
 
 <script>
 import axios from 'axios';
+import { setAuthenticated } from '../auth';
 
 export default {
   data() {
@@ -38,40 +39,32 @@ export default {
   methods: {
     async handleSignup() {
       try {
-        // Fetch existing users
         const { data: users } = await axios.get("http://127.0.0.1:3000/users");
-
-        // Check if the email already exists
         const existingUser = users.find(user => user.email === this.email);
-
         if (existingUser) {
           alert('Email already exists. Please log in.');
           this.$router.push('/');
           return;
         }
-
-        // Determine the new ID
         let newId = 1;
         if (users.length > 0) {
           const ids = users.map(user => parseInt(user.id, 10));
           newId = Math.max(...ids) + 1;
         }
-
-        // Create new user with the new ID
         const newUser = {
           id: newId.toString(),
           email: this.email,
-          password: this.password
+          password: this.password  // Again, ensure security practices are followed.
         };
-
-        // Post new user to the database
         const result = await axios.post("http://127.0.0.1:3000/users", newUser);
         console.warn(result);
+        
+        // Update global authentication state
+        setAuthenticated(true);  // Update the shared auth state
 
-        // Redirect to upload page
         this.$router.push('/upload');
       } catch (error) {
-        console.error('There was an error!', error);
+        console.error('Signup failed:', error);
       }
     }
   }

@@ -13,7 +13,7 @@
         <form @submit.prevent="login">
           <input type="email" placeholder="Email" v-model="email" required />
           <input type="password" placeholder="Password" v-model="password" required />
-          <button type="submit" class="sign-in-button">Sign In</button>
+          <button type="submit" class="sign-in-button">Login In</button>
         </form>
       </div>
     </div>
@@ -34,6 +34,7 @@
 
 <script>
 import axios from 'axios';
+import { setAuthenticated } from '../auth'; // Import the setAuthenticated function
 
 export default {
   data() {
@@ -52,6 +53,9 @@ export default {
         const user = users.find(user => user.email === this.email && user.password === this.password);
 
         if (user) {
+          // Update global authentication state
+          setAuthenticated(true);  // Update the shared auth state
+
           // Redirect to upload page
           this.$router.push('/upload');
         } else {
