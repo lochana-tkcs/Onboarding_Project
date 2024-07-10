@@ -1,7 +1,7 @@
 <template>
   <div class="auth-container">
     <div class="auth-left">
-      <img src="C:\m3\frontend-master\src\assets\csv file.png" alt="Logo" class="logo" />
+      <img :src="require('@/assets/logo.png')" alt="Logo" class="logo" />
       <div class="auth-content">
         <h1>Login to Your Account</h1>
         <p>Login using social networks</p>
