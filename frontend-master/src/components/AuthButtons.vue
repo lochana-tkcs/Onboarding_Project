@@ -1,7 +1,7 @@
 <template>
   <div class="auth-container">
     <div class="auth-left">
-      <img :src="require('@/assets/logo.png')" alt="Logo" class="logo" />
+      <img :src="logo" alt="Logo" class="logo" />
       <div class="auth-content">
         <h1>Login to Your Account</h1>
         <p>Login using social networks</p>
@@ -14,6 +14,7 @@
           <input type="email" placeholder="Email" v-model="email" required />
           <input type="password" placeholder="Password" v-model="password" required />
           <button type="submit" class="sign-in-button">Login In</button>
+          <p v-if="error" class="error-message">{{ error }}</p>
         </form>
       </div>
     </div>
@@ -33,40 +34,41 @@
 </template>
 
 <script>
+import logo from '../assets/logo.png';
 import axios from 'axios';
-import { setAuthenticated } from '../auth'; // Import the setAuthenticated function
+import { setAuthenticated } from '../auth';
 
 export default {
   data() {
     return {
       email: '',
-      password: ''
+      password: '',
+      error: '',
+      logo: logo
     };
   },
   methods: {
     async login() {
-      try {
-        // Fetch existing users
-        const { data: users } = await axios.get("http://127.0.0.1:3000/users");
+      if (!this.email || !this.password) {
+        this.error = 'Please fill in all fields';
+        return;
+      }
 
-        // Check if the email and password match
+      try {
+        const { data: users } = await axios.get("http://127.0.0.1:3000/users");
         const user = users.find(user => user.email === this.email && user.password === this.password);
 
         if (user) {
-          // Update global authentication state
-          setAuthenticated(true);  // Update the shared auth state
-
-          // Redirect to upload page
+          setAuthenticated(true);
           this.$router.push('/upload');
         } else {
-          alert('Invalid email or password. Please try again.');
+          this.error = 'Invalid email or password. Please try again.';
         }
       } catch (error) {
         console.error('There was an error!', error);
       }
     },
     signUp() {
-      // Navigate to the signup endpoint
       this.$router.push('/signup');
     }
   }

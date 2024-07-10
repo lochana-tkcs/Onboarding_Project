@@ -1,30 +1,35 @@
-import { defineConfig } from "vite";
-import vue from "@vitejs/plugin-vue";
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import path from 'path';
 
 export default defineConfig({
   plugins: [vue()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
   server: {
     proxy: {
-      "/upload": {
-        target: "http://localhost:8080",
+      '/upload': {
+        target: 'http://localhost:8080',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/upload/, ""),
+        rewrite: (path) => path.replace(/^\/upload/, ''),
       },
-      // "/signup": {
-      //   target: "http://localhost:8080",
-      //   changeOrigin: true,
-      //   rewrite: (path) => path.replace(/^\/signup/, ""),
-      // },
-      "/register": {
-        target: "http://localhost:8080",
+      '/register': {
+        target: 'http://localhost:8080',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/register/, ""),
+        rewrite: (path) => path.replace(/^\/register/, ''),
       },
-      "/login": {
-        target: "http://localhost:8080",
+      '/login': {
+        target: 'http://localhost:8080',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/login/, ""),
+        rewrite: (path) => path.replace(/^\/login/, ''),
       },
     },
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
   },
 });
