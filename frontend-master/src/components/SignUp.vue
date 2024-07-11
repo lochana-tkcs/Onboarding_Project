@@ -52,7 +52,7 @@ export default {
           newId = Math.max(...ids) + 1;
         }
         const newUser = {
-          id: newId.toString(),
+          id: newId, // Ensure id is stored as an integer
           email: this.email,
           password: this.password  // Again, ensure security practices are followed.
         };

@@ -1,64 +1,34 @@
 {
   "users": [
     {
-      "id": "1",
+      "id": 1,
       "email": "lochanasrinivas2001@gmail.com",
-      "password": "hjvrqwkurgf"
-    },
-    {
-      "id": "2",
-      "email": "lochanasrinivas2001@gmail.com",
-      "password": "hcgvhb"
-    },
-    {
-      "id": "3",
-      "email": "lochanasrinivas2001@gmail.com",
-      "password": "jhvsbf"
-    },
-    {
-      "id": "4",
-      "email": "lochanasrinivas2001@gmail.com",
-      "password": "jhvbdjnsb"
-    },
-    {
-      "id": "5",
-      "email": "lochanasrinivas2001@gmail.com",
-      "password": "hhgcnb "
-    },
-    {
-      "id": "6",
-      "email": "kahsbc@gmail.com",
-      "password": "hjvd"
-    },
-    {
-      "id": "7",
-      "email": "loc@gmail.com",
       "password": "123"
     },
     {
-      "id": "8",
+      "id": 2,
+      "email": "loc@gmail.com",
+      "password": "456"
+    },
+    {
+      "id": 3,
       "email": "mjhs@yahoo",
-      "password": "jhqaf"
+      "password": "mjshv"
     },
     {
-      "id": "9",
-      "email": "mhxd@jhs",
-      "password": "jhsf"
+      "id": 4,
+      "email": "kahsbc@gmail.com",
+      "password": "jhsbfvsnd"
     },
     {
-      "id": "10",
-      "email": "hgsaf@mammo",
-      "password": "jhacsv"
-    },
-    {
-      "id": "11",
+      "id": 5,
       "email": "yaji@clever.co",
-      "password": "hjcwgd"
+      "password": "1432"
     },
     {
-      "id": "12",
+      "id": 6,
       "email": "pra@gold.com",
-      "password": "amhf"
+      "password": "askjvf"
     }
   ]
 }

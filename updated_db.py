@@ -1,5 +1,7 @@
 import json
-from sqlalchemy import create_engine, Column, String, select
+import schedule
+import time
+from sqlalchemy import create_engine, Column, Integer, String, select
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 # Define the database URL
@@ -14,7 +16,7 @@ Base = declarative_base()
 # Define the User class which will be mapped to the 'users' table
 class User(Base):
     __tablename__ = 'users'
-    id = Column(String, primary_key=True)
+    id = Column(Integer, primary_key=True)
     email = Column(String)
     password = Column(String)
 
@@ -31,7 +33,7 @@ def update_database():
         data = json.load(file)
 
     # Fetch existing user IDs from the database to avoid duplicates
-    existing_user_ids = {user.id for user in session.execute(select(User.id)).scalars()}
+    existing_user_ids = {user_id for user_id in session.execute(select(User.id)).scalars().all()}
 
     # Insert the data into the database if not already present
     for user_data in data['users']:
@@ -44,5 +46,10 @@ def update_database():
 
     print("Data updated successfully!")
 
-# Call the update_database function directly
-update_database()
+# Schedule the update_database function to run every 20 seconds
+schedule.every(30).seconds.do(update_database)
+
+# Keep the script running
+while True:
+    schedule.run_pending()
+    time.sleep(1)
