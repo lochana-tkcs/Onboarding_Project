@@ -12,16 +12,17 @@ def store_csv_data(file_path):
     con = None
     try:
         con = duckdb.connect('my_database.db')
-        
-        # Drop the table if it exists and then create the table and load the CSV data directly
+
+        # Drop the table if it exists, and then create the table and load the CSV data directly
         con.execute("DROP TABLE IF EXISTS my_table")
         con.execute(f"""
             CREATE TABLE my_table AS
             SELECT * FROM read_csv_auto('{file_path}')
         """)
         result = con.execute("SELECT * FROM my_table").fetchall()
-        
+
         return result
+
     except Exception as e:
         # Handle exceptions appropriately
         print(f"An error occurred: {e}")
@@ -32,6 +33,41 @@ def store_csv_data(file_path):
         # Clean up the temporary file
         if os.path.exists(file_path):
             os.remove(file_path)
+
+# @app.task
+# def store_csv_data(file_path):
+#     con = None
+#     try:
+#         con = duckdb.connect('my_database.db')
+
+#         # Drop the table if it exists
+#         con.execute("DROP TABLE IF EXISTS my_table")
+#         con.execute("""
+#             CREATE TABLE my_table (
+#                 column1 TEXT,
+#                 column2 TEXT,
+#                 column3 TEXT,
+#                 ...
+#             )
+#         """)
+        
+#         # Read CSV in chunks and insert each chunk into the table
+#         chunksize = 1000  # Adjust the chunksize as needed
+#         for chunk in pd.read_csv(file_path, chunksize=chunksize):
+#             con.execute("INSERT INTO my_table SELECT * FROM ?", (chunk,))
+        
+#         result = con.execute("SELECT * FROM my_table").fetchall()
+#         return result
+#     except Exception as e:
+#         # Handle exceptions appropriately
+#         print(f"An error occurred: {e}")
+#         raise e
+#     finally:
+#         if con is not None:
+#             con.close()
+#         # Clean up the temporary file
+#         if os.path.exists(file_path):
+#             os.remove(file_path)
 
 # @app.task
 # def store_csv_data(file_path):

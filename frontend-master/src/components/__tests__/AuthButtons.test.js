@@ -3,7 +3,6 @@ import { mount } from '@vue/test-utils';
 import axios from 'axios';
 import AuthButtons from '../AuthButtons.vue';
 import { setAuthenticated } from '../../auth';
-// C:\m3\frontend-master\src\auth.js
 
 //Testing that the component mounts properly and renders all expected sub-components and elements.
 describe('AuthButtons', () => {

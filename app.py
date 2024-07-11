@@ -6,38 +6,31 @@ import pandas as pd
 from tasks import store_csv_data
 import duckdb
 from litestar.config.cors import CORSConfig
-from pydantic import BaseModel
+import aiofiles
 
 cors_config = CORSConfig(allow_origins=["http://localhost:8080"])
 
-# def store_csv_data():
-#     file_path = 'C:/m3/temp.csv'
-#     con = None
-#     try:
-#         con = duckdb.connect('my_database.db')
-        
-#         # Drop the table if it exists and then create the table and load the CSV data directly
-#         con.execute("DROP TABLE IF EXISTS my_table")
-#         con.execute(f"""
-#             CREATE TABLE my_table AS
-#             SELECT * FROM read_csv_auto('{file_path}')
-#         """)
-#         result = con.execute("SELECT * FROM my_table").fetchall()
-        
-#         return result
-#     except Exception as e:
-#         # Handle exceptions appropriately
-#         print(f"An error occurred: {e}")
-#         raise e
-#     finally:
-#         if con is not None:
-#             con.close()
-#         # Clean up the temporary file
-#         if os.path.exists(file_path):
-#             os.remove(file_path)
-
 async def upload_csv(request: Request) -> Response:
     file_path = 'C:/m3/temp.csv'
+
+    # with open(file_path, 'wb') as file:
+    #     async for chunk in request.stream():
+    #         file.write(chunk)
+
+    # async with aiofiles.open(file_path, 'w', encoding='utf-8', newline='') as file:
+    #     async for chunk in request.stream():
+    #         lines = chunk.decode('utf-8').splitlines()
+    #         for line in lines:
+    #             # Split the line into columns
+    #             columns = line.split(',')
+    #             # Create a CSV formatted string
+    #             output = io.StringIO()
+    #             csv_writer = csv.writer(output)
+    #             csv_writer.writerow(columns)
+    #             # Write the CSV formatted string to the file
+    #             await file.write(output.getvalue())
+    #             output.close()
+
     form = await request.form()
     uploaded_file = form['file']
 
@@ -46,6 +39,8 @@ async def upload_csv(request: Request) -> Response:
 
     # Save DataFrame to CSV
     df.to_csv(file_path, index=False)
+
+    # Celery Task
     result = store_csv_data(file_path)
 
     return Response({"message": "File uploaded successfully and data inserted into DuckDB", "data": result}, media_type="application/json")
