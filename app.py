@@ -49,19 +49,8 @@ async def upload_csv(request: Request) -> Response:
 async def upload_csv_endpoint(request: Request) -> Response:
     return await upload_csv(request)
 
-@get("/data")
-async def get_csv_data(request: Request) -> Response:
-    # Retrieve the data from DuckDB
-    con = duckdb.connect('my_database.db')
-    try:
-        # Fetch the table contents
-        result = con.execute("SELECT * FROM my_table").fetchdf()
-    finally:
-        con.close()
-    return Response({"data": result}, media_type="application/json")
-
 # Create the Litestar app with CORS middleware
-app = Litestar(route_handlers=[upload_csv_endpoint, get_csv_data], cors_config=cors_config)
+app = Litestar(route_handlers=[upload_csv_endpoint], cors_config=cors_config)
 
 if __name__ == "__main__":
     import uvicorn
