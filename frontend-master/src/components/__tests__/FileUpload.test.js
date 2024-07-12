@@ -8,7 +8,9 @@ import axios from 'axios';
 
 // Mock axios to prevent actual network calls
 vi.mock('axios', () => ({
-  post: vi.fn()
+  default: {
+    post: vi.fn(() => Promise.resolve({ data: { data: [] } }))  // Directly return the mock resolved value
+  }
 }));
 
 // Setup custom render with Vuetify
@@ -67,6 +69,24 @@ describe('FileUpload.vue', () => {
     
     await fireEvent.change(input); // This should trigger the input event correctly
     expect(getByText('test.csv')).toBeInTheDocument();
-  });    
+  });  
   
+  it('calls onSubmit when the submit button is clicked with a valid file', async () => {
+    const { getByLabelText, getByText } = customRender(FileUpload);
+    const input = getByLabelText('Choose file');
+    const submitButton = getByText('Submit');
+  
+    // Simulate file selection
+    Object.defineProperty(input, 'files', { value: [mockFile], writable: false });
+    await fireEvent.change(input);
+  
+    // Mock axios to simulate successful upload
+    axios.post.mockResolvedValue({ data: { data: [] } });
+  
+    // Click submit button
+    await fireEvent.click(submitButton);
+  
+    // Check if axios.post was called
+    expect(axios.post).toHaveBeenCalled();
+  });
 });
