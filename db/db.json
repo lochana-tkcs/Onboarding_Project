@@ -31,9 +31,14 @@
       "password": "askjvf"
     },
     {
-      "id": 7,
+      "id": "7",
       "email": "prajna@mammoth",
       "password": "jgsvc"
+    },
+    {
+      "id": 8,
+      "email": "smjh@mail.com",
+      "password": "24326"
     }
   ]
 }

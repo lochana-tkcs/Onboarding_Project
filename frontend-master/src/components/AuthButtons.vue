@@ -15,7 +15,6 @@
           <input type="password" placeholder="Password" v-model="password" required />
           <button type="submit" class="sign-in-button">Login In</button>
           <p v-if="error" class="error-message">{{ error }}</p>
-          <p v-if="redirecting" class="redirect-message">Redirecting...</p>
         </form>
       </div>
     </div>
@@ -45,7 +44,6 @@ export default {
       email: '',
       password: '',
       error: '',
-      redirecting: false,
       logo: logo
     };
   },
@@ -57,15 +55,12 @@ export default {
       }
 
       try {
-        const { data } = await axios.get("http://127.0.0.1:3000/users");
-        const user = data.users.find(user => user.email === this.email && user.password === this.password);
+        const { data: users } = await axios.get("http://127.0.0.1:3000/users");
+        const user = users.find(user => user.email === this.email && user.password === this.password);
 
         if (user) {
           setAuthenticated(true);
-          this.redirecting = true;
-          setTimeout(() => {
-            this.$router.push('/upload');
-          }, 1000);
+          this.$router.push('/upload');
         } else {
           this.error = 'Invalid email or password. Please try again.';
         }

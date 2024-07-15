@@ -19,14 +19,14 @@
           :height="'auto'"
         ></v-data-table>
       </div>
+      <button @click="logout" class="logout-button">Logout</button>
     </form>
   </div>
 </template>
 
-
-
 <script>
 import axios from "axios";
+import { useRouter } from "vue-router";
 
 export default {
   name: "FileUpload",
@@ -37,6 +37,10 @@ export default {
       headers: [],
       items: [],
     };
+  },
+  setup() {
+    const router = useRouter();
+    return { router };
   },
   methods: {
     onSelect() {
@@ -73,6 +77,9 @@ export default {
         this.message = err.response ? err.response.data.error : "Upload failed";
       }
     },
+    logout() {
+      this.router.push("/"); // Redirect to landing page
+    },
   },
 };
 </script>
@@ -82,6 +89,7 @@ export default {
   width: 100%;
   margin: 20px auto;
   font-family: Arial, sans-serif; /* You can change this to your preferred font */
+  position: relative; /* To position the logout button */
 }
 form {
   display: flex;
@@ -154,5 +162,25 @@ button:hover {
 }
 ::v-deep .v-data-table tbody tr:nth-child(even) {
   background-color: #e0f2f1; /* Even rows light green */
+}
+.logout-button {
+  position: absolute; /* Positioning at the top right corner */
+  top: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background-color: white; /* White background */
+  color: #00796b; /* Green text */
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 50%; /* Round shape */
+  transition: background-color 0.3s, color 0.3s ease;
+  font-weight: bold; /* Make text bold */
+  display: flex; /* Center text inside the button */
+  justify-content: center; /* Center text horizontally */
+  align-items: center; /* Center text vertically */
+}
+.logout-button:hover {
+  background-color: #e0f2f1; /* Light green background on hover */
 }
 </style>
